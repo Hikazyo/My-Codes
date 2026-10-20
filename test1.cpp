@@ -1,37 +1,46 @@
 #include <bits/stdc++.h>
 using namespace std;
+int main()
+{
+    long long m, n, t;
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    cin >> m;
+    for (long long i = 0; i < m; i++)
+    {
+        vector<long long> map;
+        cin >> n;
+        for (long long k = 0; k < n; k++)
+        {
+            cin >> t;
+            map.push_back(t);
+        }
 
-    int n;
-    long long x;
-    cin >> n >> x;
+        long long count = 0;
+        unordered_map<long long, vector<long long>> hx;
 
-    const long long NEG = LLONG_MIN / 4;   // 防止加法溢出
+        for (long long j = 0; j < n - 4; j++)
+        {
 
-    long long dp0 = NEG;  // 未开始调制（前缀）
-    long long dp1 = NEG;  // 调制进行中（乘 x 的中间段）
-    long long dp2 = NEG;  // 调制已结束（后缀）
-    long long ans = NEG;
+            hx[map[j] + map[j + 2] - map[j + 4]].push_back(j);
+        }
 
-    for (int i = 0; i < n; i++) {
-        long long v;
-        cin >> v;
-        long long xv = v * x;
+        for (const auto &p : hx)
+        {
+            const vector<long long> &v = p.second;
+            long long temp = v.size();
+            count += temp * (temp - 1) / 2;
 
-        long long ndp0 = max(dp0 + v, v);            // 延续前缀 / 重新起段
-        long long ndp1 = max({dp1 + xv, dp0 + xv, xv}); // 延续调制 / 前缀后开调 / 直接调制开头
-        long long ndp2 = max({dp2 + v, dp1 + v, v}); // 延续后缀 / 调制刚结束 / 全新原值段
-
-        dp0 = ndp0;
-        dp1 = ndp1;
-        dp2 = ndp2;
-
-        ans = max(ans, max(dp0, max(dp1, dp2)));
+            unordered_set<long long> st(v.begin(), v.end());
+            for (long long x : v)
+            {
+                if (st.count(x + 2))
+                    count--;
+                if (st.count(x + 4))
+                    count--;
+            }
+        }
+        cout << count << endl;
     }
 
-    cout << ans << '\n';
     return 0;
 }
